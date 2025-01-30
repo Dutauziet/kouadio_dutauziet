@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page d'accueil</title>
+    <style>
+        /* Style du corps */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5; /* Fond gris clair pour une apparence plus professionnelle */
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Barre de navigation */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2c3e50; /* Bleu marine */
+            padding: 15px 20px;
+            color: white;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+        }
+
+        .navbar a:hover {
+            background-color: #34495e; /* Bleu marine plus clair pour le survol */
+        }
+
+        /* Message de bienvenue */
+        .welcome {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.5em;
+            color: #2c3e50; /* Bleu marine pour un ton plus sobre */
+        }
+
+        /* Trombinoscope */
+        .trombinoscope {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Carte de profil */
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #16a085; /* Vert foncé pour une touche professionnelle */
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #1abc9c; /* Vert plus clair au survol */
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .card h3 {
+            margin: 10px 0;
+            color: #2c3e50; /* Bleu marine pour l'harmonie */
+        }
+
+        .card p {
+            color: #7f8c8d; /* Gris clair pour les informations */
+            margin-bottom: 15px;
+        }
+
+        .card button {
+            background-color: #16a085; /* Vert foncé */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .card button:hover {
+            background-color: #1abc9c; /* Vert plus clair au survol */
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Message de bienvenue -->
+    <div>
+        {% if user.is_authenticated %}
+            <p class="welcome">Bienvenue, {{ user.first_name|default:user.username }} !</p>
+        {% else %}
+            <p class="welcome">Bienvenue sur le Trombinoscope</p>
+        {% endif %}
+    </div>
+
+    <!-- Barre de navigation -->
+    <div class="navbar">
+        {% if user.is_authenticated %}
+            <a href="{% url 'ajouter_cv' %}">Ajouter un CV</a>
+            <a href="{% url 'logout' %}">Se déconnecter</a>
+            <a href="{% url 'etudiant_form' %}">Gérer son profil</a>
+        {% else %}
+            <a href="{% url 'register' %}">S'enregistrer</a>
+            <a href="{% url 'login' %}">Se connecter</a>
+        {% endif %}
+    </div>
+
+    <!-- Trombinoscope -->
+    <div class="trombinoscope">
+        {% for etudiant in etudiants %}
+            <div class="card">
+                <img src="{{ etudiant.photo.url }}" alt="Photo de {{ etudiant.prenom }}">
+                <h3>{{ etudiant.prenom }} {{ etudiant.nom }}</h3>
+                <p>{{ etudiant.email }}</p>
+                <!-- Vérification si l'étudiant correspond à l'utilisateur connecté -->
+                {% if user.is_authenticated and user == etudiant.user %}
+                    <button onclick="window.location.href='{% url 'mes_cvs' %}'">Voir mes CV</button>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
